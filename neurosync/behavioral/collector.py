@@ -28,6 +28,12 @@ from neurosync.database.manager import DatabaseManager
 from neurosync.database.repositories.events import EventRepository
 from neurosync.database.repositories.sessions import SessionRepository
 
+# Step 2 — optional webcam score type (imported lazily to avoid hard dep)
+try:
+    from neurosync.webcam.fusion import WebcamMomentScores as _WebcamScores
+except ImportError:  # pragma: no cover
+    _WebcamScores = None  # type: ignore[assignment,misc]
+
 
 class AsyncEventCollector:
     """
@@ -122,6 +128,30 @@ class AsyncEventCollector:
 
         await self._queue.put(event)
         logger.debug("Idle event: {}ms after {}", event.idle_duration_ms, event.preceding_event_type)
+
+    # ------------------------------------------------------------------
+    # Step 2 — Webcam signal injection
+    # ------------------------------------------------------------------
+
+    async def inject_webcam_signal(self, scores: object) -> None:
+        """
+        Merge webcam moment scores into the current signal context.
+
+        Called by ``WebcamSignalInjector`` so that the behavioral fusion
+        engine can use visual signals in its next cycle.
+
+        Parameters
+        ----------
+        scores:
+            A ``WebcamMomentScores`` instance (from ``neurosync.webcam.fusion``).
+        """
+        # Store latest webcam scores for downstream consumers
+        self._latest_webcam_scores = scores
+        logger.debug(
+            "Webcam signal injected — face_detected={}, attention={:.2f}",
+            getattr(scores, "face_detected", False),
+            getattr(scores, "attention_score", 0.0),
+        )
 
     async def get_session_summary(self) -> dict[str, object]:
         """Returns current session statistics for dashboard."""

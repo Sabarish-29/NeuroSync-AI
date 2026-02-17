@@ -120,3 +120,18 @@ def make_idle_event(
         idle_duration_ms=idle_duration_ms,
         preceding_event_type="click",
     )
+
+
+# =====================================================================
+# Step 2 — Webcam fixtures (re-export from conftest_webcam)
+# =====================================================================
+from tests.conftest_webcam import (  # noqa: E402, F401
+    mock_frame_face_centered,
+    mock_frame_no_face,
+    mock_landmarks_neutral,
+    mock_landmarks_looking_left,
+    mock_landmarks_no_face,
+    mock_landmarks_frustrated,
+    mock_landmarks_bored,
+    mock_landmarks_closed_eyes,
+)

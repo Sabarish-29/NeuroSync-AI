@@ -71,7 +71,48 @@ BEHAVIORAL_THRESHOLDS: dict[str, float | int] = {
 }
 
 
+# =============================================================================
+# Webcam Thresholds (Step 2)
+# =============================================================================
+WEBCAM_THRESHOLDS: dict[str, float | int] = {
+    # Gaze (M01)
+    "GAZE_OFF_SCREEN_TRIGGER_MS": 4000,
+    "GAZE_SCREEN_CENTER_TOLERANCE": 0.15,
+    "GAZE_CONFIDENCE_MINIMUM": 0.60,
+
+    # Blink (M10 boost)
+    "BLINK_FATIGUE_HIGH_RATE": 25,       # blinks/min
+    "BLINK_FATIGUE_LOW_RATE": 8,
+    "BLINK_ANXIETY_RATE": 30,
+    "BLINK_FLOW_RATE": 8,
+    "EAR_BLINK_THRESHOLD": 0.20,
+
+    # Expression (M07 boost)
+    "EXPRESSION_FRUSTRATION_THRESHOLD": 0.55,
+    "EXPRESSION_BOREDOM_THRESHOLD": 0.60,
+    "EXPRESSION_EMA_ALPHA": 0.30,        # smoothing factor
+
+    # Pose (M11)
+    "FIDGET_VARIANCE_THRESHOLD": 0.018,
+    "POSTURE_WINDOW_FRAMES": 90,
+
+    # rPPG (secondary only)
+    "RPPG_BUFFER_SECONDS": 10,
+    "RPPG_BANDPASS_LOW": 0.7,
+    "RPPG_BANDPASS_HIGH": 3.5,
+    "RPPG_QUALITY_THRESHOLD": 0.50,
+    "RPPG_STRESS_HR_THRESHOLD": 90,
+
+    # Fusion
+    "WEBCAM_FUSION_INTERVAL_SECONDS": 1.0,
+    "WEBCAM_FACE_REQUIRED_CONFIDENCE": 0.70,
+    "WEBCAM_FRAME_ROLLING_WINDOW": 30,   # frames for majority vote
+}
+
+
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
-    value = BEHAVIORAL_THRESHOLDS[key]
+    value = BEHAVIORAL_THRESHOLDS.get(key) or WEBCAM_THRESHOLDS.get(key)
+    if value is None:
+        raise KeyError(key)
     return float(value)
