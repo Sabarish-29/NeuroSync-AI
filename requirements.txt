@@ -1,0 +1,31 @@
+# Core
+pydantic>=2.0.0
+loguru>=0.7.0
+
+# Signal processing
+scipy>=1.11.0
+numpy>=1.24.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+
+# Database
+# sqlite3 is stdlib — no extra package needed
+
+# Development
+black>=23.0.0
+ruff>=0.0.290
+mypy>=1.5.0
+
+# Future steps (commented out — install when needed)
+# mediapipe>=0.10.0        # Step 2
+# neo4j>=5.0.0             # Step 3
+# spacy>=3.6.0             # Step 4
+# langchain>=0.0.300       # Step 5
+# openai>=1.0.0            # Step 6
+# python-pptx>=0.6.21      # Step 7
+# moviepy>=1.0.3           # Step 7
+# pyserial>=3.5            # Step 10
+# mne>=1.5.0               # Step 10

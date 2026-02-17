@@ -26,8 +26,12 @@ build/
 venv/
 env/
 ENV/
-.env
 *.env.local
+.mypy_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+*.pyo
 
 # =========================
 # Node.js / JavaScript
@@ -48,6 +52,12 @@ out/
 *.log
 *.sqlite3
 *.db
+logs/
+
+# =========================
+# Project data
+# =========================
+data/
 
 # =========================
 # Secrets & Config
