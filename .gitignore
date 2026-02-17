@@ -1,0 +1,67 @@
+# =========================
+# OS / Editor generated files
+# =========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+.venv/
+venv/
+env/
+ENV/
+.env
+*.env.local
+
+# =========================
+# Node.js / JavaScript
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+out/
+.nuxt/
+.cache/
+
+# =========================
+# Logs & Databases
+# =========================
+*.log
+*.sqlite3
+*.db
+
+# =========================
+# Secrets & Config
+# =========================
+.env
+.env.*
+!.env.example
+config/secrets.*
+
+# =========================
+# Build / Compiled output
+# =========================
+dist/
+build/
+*.o
+*.so
+*.dll
