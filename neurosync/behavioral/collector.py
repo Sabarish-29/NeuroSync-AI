@@ -153,6 +153,58 @@ class AsyncEventCollector:
             getattr(scores, "attention_score", 0.0),
         )
 
+    # ------------------------------------------------------------------
+    # Step 3 — Knowledge graph concept encounter
+    # ------------------------------------------------------------------
+
+    async def record_concept_encounter(
+        self,
+        concept_id: str,
+        concept_name: str = "",
+        category: str = "core",
+        action: str = "encountered",
+        score_delta: float = 0.0,
+        metadata: dict | None = None,
+    ) -> None:
+        """
+        Record that the student encountered or interacted with a concept.
+
+        Creates a ConceptEvent and pushes it to the queue for downstream
+        knowledge-graph processors to consume.
+
+        Parameters
+        ----------
+        concept_id : str
+            Unique concept identifier.
+        concept_name : str
+            Human-readable concept name.
+        category : str
+            One of: core, prerequisite, extension, application, misconception.
+        action : str
+            One of: encountered, answered, reviewed, struggled, mastered.
+        score_delta : float
+            Change in mastery score (positive or negative).
+        metadata : dict, optional
+            Extra data about the encounter.
+        """
+        from neurosync.core.events import ConceptEvent  # lazy import
+
+        event = ConceptEvent(
+            session_id=self._config.session_id,
+            student_id=self._config.student_id,
+            concept_id=concept_id,
+            concept_name=concept_name,
+            category=category,  # type: ignore[arg-type]
+            action=action,  # type: ignore[arg-type]
+            score_delta=score_delta,
+            metadata=metadata or {},
+        )
+        self._event_count += 1
+        logger.debug(
+            "Concept encounter recorded: {} ({}) — action={}, delta={:.2f}",
+            concept_id, concept_name, action, score_delta,
+        )
+
     async def get_session_summary(self) -> dict[str, object]:
         """Returns current session statistics for dashboard."""
         now = time.time() * 1000.0

@@ -23,8 +23,10 @@ mypy>=1.5.0
 mediapipe>=0.10.0
 opencv-python>=4.8.0
 
+# Knowledge graph (Step 3)
+neo4j>=5.0.0
+
 # Future steps (commented out — install when needed)
-# neo4j>=5.0.0             # Step 3
 # spacy>=3.6.0             # Step 4
 # langchain>=0.0.300       # Step 5
 # openai>=1.0.0            # Step 6

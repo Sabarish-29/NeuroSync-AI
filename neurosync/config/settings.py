@@ -110,9 +110,71 @@ WEBCAM_THRESHOLDS: dict[str, float | int] = {
 }
 
 
+# =============================================================================
+# Neo4j Configuration (Step 3)
+# =============================================================================
+NEO4J_CONFIG: dict[str, object] = {
+    "URI": os.getenv("NEO4J_URI", "bolt://localhost:7687"),
+    "USER": os.getenv("NEO4J_USER", "neo4j"),
+    "PASSWORD": os.getenv("NEO4J_PASSWORD", "neurosync"),
+    "DATABASE": os.getenv("NEO4J_DATABASE", "neo4j"),
+    "MAX_CONNECTION_POOL_SIZE": 50,
+    "CONNECTION_TIMEOUT_SECONDS": 5,
+    "RETRY_ATTEMPTS": 3,
+    "RETRY_DELAY_SECONDS": 1.0,
+}
+
+
+# =============================================================================
+# Knowledge Graph Thresholds (Step 3)
+# =============================================================================
+KNOWLEDGE_THRESHOLDS: dict[str, float | int] = {
+    # M03 — Knowledge Gap
+    "GAP_PREREQUISITE_MASTERY_MIN": 0.40,     # below this = gap
+    "GAP_FAILURE_STREAK_TRIGGER": 3,          # consecutive failures
+    "GAP_CONFIDENCE_BOOST_FACTOR": 0.15,      # boost when prerequisite strong
+
+    # M06 — Stealth Boredom (mastery plateau)
+    "BOREDOM_MASTERY_CEILING": 0.90,          # above this = already mastered
+    "BOREDOM_REPEAT_THRESHOLD": 5,            # same concept N times
+    "BOREDOM_ADVANCE_SCORE": 0.85,            # suggest harder material
+
+    # M09 — Confidence Collapse (mirror)
+    "COLLAPSE_SCORE_DROP_THRESHOLD": 0.25,    # drop ≥ 25% = collapse
+    "COLLAPSE_WINDOW_SECONDS": 300,           # within 5 minutes
+    "COLLAPSE_RECOVERY_TARGET": 0.60,         # recovery milestone
+
+    # M15 — Misconception
+    "MISCONCEPTION_REPEAT_WRONG_THRESHOLD": 2,  # same wrong answer N times
+    "MISCONCEPTION_CONFIDENCE_MIN": 0.50,        # student thinks they're right
+    "MISCONCEPTION_PENALTY_FACTOR": 0.30,        # mastery score penalty
+
+    # M16 — Working Memory Overflow (chunk tracker)
+    "CHUNK_MAX_NEW_CONCEPTS": 4,              # max new concepts at once
+    "CHUNK_WINDOW_MINUTES": 10,               # within N minutes
+    "CHUNK_MASTERY_NEW_THRESHOLD": 0.30,      # below = still new
+
+    # M22 — Plateau Escape
+    "PLATEAU_MIN_ATTEMPTS": 8,                # min attempts to detect
+    "PLATEAU_VARIANCE_MAX": 0.05,             # score variance < 5% = plateau
+    "PLATEAU_DURATION_MINUTES": 15,           # for at least N minutes
+    "PLATEAU_STRATEGY_SWITCH_SCORE": 0.55,    # try alternative approach
+
+    # General graph
+    "MASTERY_DECAY_RATE_PER_DAY": 0.02,       # forgetting curve
+    "MASTERY_INITIAL_SCORE": 0.0,
+    "MASTERY_MAX_SCORE": 1.0,
+    "MASTERY_CORRECT_INCREMENT": 0.15,
+    "MASTERY_INCORRECT_DECREMENT": 0.10,
+    "MASTERY_SPEED_BONUS_THRESHOLD_MS": 5000,
+    "MASTERY_SPEED_BONUS": 0.05,
+}
+
+
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
-    value = BEHAVIORAL_THRESHOLDS.get(key) or WEBCAM_THRESHOLDS.get(key)
-    if value is None:
-        raise KeyError(key)
-    return float(value)
+    for source in (BEHAVIORAL_THRESHOLDS, WEBCAM_THRESHOLDS, KNOWLEDGE_THRESHOLDS):
+        value = source.get(key)
+        if value is not None:
+            return float(value)
+    raise KeyError(key)

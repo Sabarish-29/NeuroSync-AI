@@ -104,3 +104,45 @@ SCROLL_RUSHING: Final[str] = "rushing"
 REWARD_TYPES: Final[list[str]] = [
     "streak", "mastery", "speed", "consistency", "explorer",
 ]
+
+# =============================================================================
+# Concept categories (Step 3 — Knowledge Graph)
+# =============================================================================
+CONCEPT_CATEGORY_CORE: Final[str] = "core"
+CONCEPT_CATEGORY_PREREQUISITE: Final[str] = "prerequisite"
+CONCEPT_CATEGORY_EXTENSION: Final[str] = "extension"
+CONCEPT_CATEGORY_APPLICATION: Final[str] = "application"
+CONCEPT_CATEGORY_MISCONCEPTION: Final[str] = "misconception"
+
+CONCEPT_CATEGORIES: Final[list[str]] = [
+    CONCEPT_CATEGORY_CORE,
+    CONCEPT_CATEGORY_PREREQUISITE,
+    CONCEPT_CATEGORY_EXTENSION,
+    CONCEPT_CATEGORY_APPLICATION,
+    CONCEPT_CATEGORY_MISCONCEPTION,
+]
+
+# =============================================================================
+# Graph mastery levels (Step 3)
+# =============================================================================
+GRAPH_MASTERY_NOVICE: Final[str] = "novice"
+GRAPH_MASTERY_DEVELOPING: Final[str] = "developing"
+GRAPH_MASTERY_PROFICIENT: Final[str] = "proficient"
+GRAPH_MASTERY_MASTERED: Final[str] = "mastered"
+
+GRAPH_MASTERY_LEVELS: Final[list[str]] = [
+    GRAPH_MASTERY_NOVICE,
+    GRAPH_MASTERY_DEVELOPING,
+    GRAPH_MASTERY_PROFICIENT,
+    GRAPH_MASTERY_MASTERED,
+]
+
+# =============================================================================
+# Graph relationship types (Step 3)
+# =============================================================================
+REL_PREREQUISITE: Final[str] = "REQUIRES"
+REL_HAS_MISCONCEPTION: Final[str] = "HAS_MISCONCEPTION"
+REL_STUDIED: Final[str] = "STUDIED"
+REL_MASTERED: Final[str] = "MASTERED"
+REL_STRUGGLES_WITH: Final[str] = "STRUGGLES_WITH"
+REL_NEXT_CONCEPT: Final[str] = "NEXT_CONCEPT"

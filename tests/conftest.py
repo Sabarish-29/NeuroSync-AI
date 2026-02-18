@@ -135,3 +135,12 @@ from tests.conftest_webcam import (  # noqa: E402, F401
     mock_landmarks_bored,
     mock_landmarks_closed_eyes,
 )
+
+
+# =====================================================================
+# Step 3 — Knowledge graph fixtures (re-export from conftest_graph)
+# =====================================================================
+from tests.conftest_graph import (  # noqa: E402, F401
+    mock_graph_manager,
+    seeded_graph,
+)

@@ -225,3 +225,35 @@ class MomentFlags(BaseModel):
     interventions_ready: list[InterventionRequest] = Field(default_factory=list)
     priority_intervention: Optional[InterventionRequest] = None
     all_signal_scores: dict[str, float] = Field(default_factory=dict)
+
+
+# =============================================================================
+# Knowledge Graph events (Step 3)
+# =============================================================================
+
+class ConceptEvent(BaseModel):
+    """Event representing a student encountering or interacting with a concept."""
+    event_id: str = Field(default_factory=_uuid)
+    session_id: str
+    student_id: str
+    timestamp: float = Field(default_factory=_now_ms)
+    concept_id: str
+    concept_name: str = ""
+    category: Literal["core", "prerequisite", "extension", "application", "misconception"] = "core"
+    action: Literal["encountered", "answered", "reviewed", "struggled", "mastered"] = "encountered"
+    score_delta: float = 0.0
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MasteryEvent(BaseModel):
+    """Event representing a mastery level change for a concept."""
+    event_id: str = Field(default_factory=_uuid)
+    student_id: str
+    concept_id: str
+    timestamp: float = Field(default_factory=_now_ms)
+    previous_score: float = 0.0
+    new_score: float = 0.0
+    previous_level: Literal["novice", "developing", "proficient", "mastered"] = "novice"
+    new_level: Literal["novice", "developing", "proficient", "mastered"] = "novice"
+    trigger: str = ""  # what caused the change (e.g., "correct_answer", "misconception_detected")
+    session_id: Optional[str] = None

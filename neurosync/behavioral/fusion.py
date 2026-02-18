@@ -281,6 +281,11 @@ class BehavioralFusionEngine:
             "mean_scroll_speed": scroll_result.mean_scroll_speed,
             "session_duration_minutes": pacing_result.session_duration_minutes,
             "engagement_rate": pacing_result.content_engagement_rate,
+            # Step 3 — Knowledge graph signals (populated by graph layer when available)
+            "graph_mastery_current_segment": 0.0,
+            "graph_gap_detected": 0.0,
+            "graph_misconception_pending": 0.0,
+            "graph_plateau_detected": 0.0,
         }
 
         # 5. Determine priority intervention
