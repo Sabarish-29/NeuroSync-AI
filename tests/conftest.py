@@ -178,3 +178,19 @@ from tests.conftest_content import (  # noqa: E402, F401
     diagram_generator,
     tts_engine,
 )
+
+# Step 5 — Fusion fixtures (re-export from conftest_fusion)
+# =========================================================
+from tests.conftest_fusion import (  # noqa: E402, F401
+    normal_state,
+    attention_drop_state,
+    overload_state,
+    frustration_critical_state,
+    boredom_state,
+    confidence_collapse_state,
+    fatigue_critical_state,
+    memory_overflow_state,
+    misconception_state,
+    gap_state,
+    plateau_state,
+)
