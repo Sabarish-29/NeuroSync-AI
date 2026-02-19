@@ -257,3 +257,37 @@ class MasteryEvent(BaseModel):
     new_level: Literal["novice", "developing", "proficient", "mastered"] = "novice"
     trigger: str = ""  # what caused the change (e.g., "correct_answer", "misconception_detected")
     session_id: Optional[str] = None
+
+
+# =============================================================================
+# NLP Pipeline events (Step 4)
+# =============================================================================
+
+class TextEvent(BaseModel):
+    """Event representing text input from a student (answer, chat, note)."""
+    event_id: str = Field(default_factory=_uuid)
+    session_id: str
+    student_id: str
+    timestamp: float = Field(default_factory=_now_ms)
+    text: str
+    text_type: Literal["answer", "chat", "note", "search", "question"] = "answer"
+    concept_id: Optional[str] = None
+    question_id: Optional[str] = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class NLPResult(BaseModel):
+    """Aggregated NLP analysis result for a piece of text."""
+    text: str = ""
+    sentiment_polarity: float = 0.0
+    sentiment_subjectivity: float = 0.0
+    sentiment_label: Literal["positive", "neutral", "negative", "frustrated"] = "neutral"
+    complexity_score: float = 0.0
+    complexity_label: Literal["simple", "moderate", "hard", "very_hard"] = "moderate"
+    confusion_score: float = 0.0
+    confusion_label: Literal["none", "mild", "moderate", "high"] = "none"
+    answer_quality: Literal["low", "moderate", "good", "excellent"] = "moderate"
+    answer_quality_score: float = 0.0
+    keywords: list[str] = Field(default_factory=list)
+    topic_drift_detected: bool = False
+    word_count: int = 0

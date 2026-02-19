@@ -286,6 +286,11 @@ class BehavioralFusionEngine:
             "graph_gap_detected": 0.0,
             "graph_misconception_pending": 0.0,
             "graph_plateau_detected": 0.0,
+            # Step 4 — NLP pipeline signals (populated when text events arrive)
+            "nlp_sentiment_polarity": 0.0,
+            "nlp_confusion_score": 0.0,
+            "nlp_answer_quality_score": 0.0,
+            "nlp_topic_drift": 0.0,
         }
 
         # 5. Determine priority intervention

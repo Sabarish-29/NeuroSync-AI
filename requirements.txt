@@ -26,8 +26,10 @@ opencv-python>=4.8.0
 # Knowledge graph (Step 3)
 neo4j>=5.0.0
 
+# NLP Pipeline (Step 4)
+textblob>=0.18.0
+
 # Future steps (commented out — install when needed)
-# spacy>=3.6.0             # Step 4
 # langchain>=0.0.300       # Step 5
 # openai>=1.0.0            # Step 6
 # python-pptx>=0.6.21      # Step 7

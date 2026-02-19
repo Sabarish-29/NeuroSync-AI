@@ -171,9 +171,55 @@ KNOWLEDGE_THRESHOLDS: dict[str, float | int] = {
 }
 
 
+# =============================================================================
+# NLP Pipeline Thresholds (Step 4)
+# =============================================================================
+NLP_THRESHOLDS: dict[str, float | int] = {
+    # Sentiment analysis
+    "SENTIMENT_FRUSTRATION_THRESHOLD": -0.30,     # polarity below = frustrated
+    "SENTIMENT_CONFUSION_THRESHOLD": -0.10,       # mild negative = confused
+    "SENTIMENT_POSITIVE_THRESHOLD": 0.30,          # polarity above = engaged/happy
+    "SENTIMENT_WINDOW_SIZE": 5,                    # texts to average
+
+    # Complexity analysis
+    "COMPLEXITY_SIMPLE_THRESHOLD": 6.0,            # Flesch-Kincaid < 6 = simple
+    "COMPLEXITY_MODERATE_THRESHOLD": 10.0,          # 6-10 = moderate
+    "COMPLEXITY_HARD_THRESHOLD": 14.0,              # 10-14 = hard, >14 = very hard
+    "COMPLEXITY_WORD_COUNT_MIN": 5,                 # min words for analysis
+
+    # Keyword extraction
+    "KEYWORD_MIN_FREQUENCY": 2,                    # min occurrences
+    "KEYWORD_MAX_KEYWORDS": 10,                    # max keywords per text
+    "KEYWORD_MIN_WORD_LENGTH": 3,                  # ignore short words
+
+    # Answer quality
+    "ANSWER_MIN_LENGTH_CHARS": 10,                 # too short = low effort
+    "ANSWER_GOOD_LENGTH_CHARS": 50,                # decent answer
+    "ANSWER_EXCELLENT_LENGTH_CHARS": 150,           # detailed answer
+    "ANSWER_KEYWORD_OVERLAP_GOOD": 0.30,           # 30% concept keyword overlap
+    "ANSWER_KEYWORD_OVERLAP_EXCELLENT": 0.60,      # 60% = excellent
+
+    # Confusion detector
+    "CONFUSION_HEDGE_WEIGHT": 0.3,                 # weight per hedge word
+    "CONFUSION_QUESTION_WEIGHT": 0.2,              # weight per question mark
+    "CONFUSION_NEGATION_WEIGHT": 0.15,             # weight per negation
+    "CONFUSION_THRESHOLD": 0.50,                   # above = confused
+
+    # Readability targets by grade
+    "READABILITY_GRADE_6_MAX": 6.0,
+    "READABILITY_GRADE_8_MAX": 8.0,
+    "READABILITY_GRADE_10_MAX": 10.0,
+    "READABILITY_GRADE_12_MAX": 12.0,
+
+    # Topic drift
+    "TOPIC_DRIFT_THRESHOLD": 0.40,                 # similarity below = drift
+    "TOPIC_DRIFT_WINDOW_SIZE": 3,                  # recent texts to compare
+}
+
+
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
-    for source in (BEHAVIORAL_THRESHOLDS, WEBCAM_THRESHOLDS, KNOWLEDGE_THRESHOLDS):
+    for source in (BEHAVIORAL_THRESHOLDS, WEBCAM_THRESHOLDS, KNOWLEDGE_THRESHOLDS, NLP_THRESHOLDS):
         value = source.get(key)
         if value is not None:
             return float(value)

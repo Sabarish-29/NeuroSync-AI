@@ -146,3 +146,26 @@ REL_STUDIED: Final[str] = "STUDIED"
 REL_MASTERED: Final[str] = "MASTERED"
 REL_STRUGGLES_WITH: Final[str] = "STRUGGLES_WITH"
 REL_NEXT_CONCEPT: Final[str] = "NEXT_CONCEPT"
+
+# =============================================================================
+# NLP signal types (Step 4)
+# =============================================================================
+SENTIMENT_POSITIVE: Final[str] = "positive"
+SENTIMENT_NEUTRAL: Final[str] = "neutral"
+SENTIMENT_NEGATIVE: Final[str] = "negative"
+SENTIMENT_FRUSTRATED: Final[str] = "frustrated"
+
+COMPLEXITY_SIMPLE: Final[str] = "simple"
+COMPLEXITY_MODERATE: Final[str] = "moderate"
+COMPLEXITY_HARD: Final[str] = "hard"
+COMPLEXITY_VERY_HARD: Final[str] = "very_hard"
+
+ANSWER_QUALITY_LOW: Final[str] = "low"
+ANSWER_QUALITY_MODERATE: Final[str] = "moderate"
+ANSWER_QUALITY_GOOD: Final[str] = "good"
+ANSWER_QUALITY_EXCELLENT: Final[str] = "excellent"
+
+CONFUSION_NONE: Final[str] = "none"
+CONFUSION_MILD: Final[str] = "mild"
+CONFUSION_MODERATE: Final[str] = "moderate"
+CONFUSION_HIGH: Final[str] = "high"

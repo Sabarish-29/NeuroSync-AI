@@ -19,9 +19,11 @@ from loguru import logger
 
 from neurosync.core.events import (
     IdleEvent,
+    NLPResult,
     QuestionEvent,
     RawEvent,
     SessionConfig,
+    TextEvent,
     VideoEvent,
 )
 from neurosync.database.manager import DatabaseManager
@@ -128,6 +130,56 @@ class AsyncEventCollector:
 
         await self._queue.put(event)
         logger.debug("Idle event: {}ms after {}", event.idle_duration_ms, event.preceding_event_type)
+
+    # ------------------------------------------------------------------
+    # Step 4 — NLP text event recording
+    # ------------------------------------------------------------------
+
+    async def record_text_event(
+        self,
+        event: TextEvent,
+        expected_keywords: list[str] | None = None,
+        reference_keywords: list[str] | None = None,
+    ) -> NLPResult:
+        """
+        Record a text event and run NLP analysis.
+
+        Parameters
+        ----------
+        event : TextEvent
+            The student text event (answer, chat, note, etc.).
+        expected_keywords : list[str], optional
+            Expected concept keywords for answer quality scoring.
+        reference_keywords : list[str], optional
+            Topic reference keywords for drift detection.
+
+        Returns
+        -------
+        NLPResult
+            The NLP analysis result for the text.
+        """
+        event.session_id = self._config.session_id
+        event.student_id = self._config.student_id
+        self._event_count += 1
+
+        # Lazy-init the NLP pipeline
+        if not hasattr(self, "_nlp_pipeline"):
+            from neurosync.nlp.pipeline import NLPPipeline
+            self._nlp_pipeline = NLPPipeline()
+
+        result = self._nlp_pipeline.analyze(
+            text=event.text,
+            expected_keywords=expected_keywords,
+            reference_keywords=reference_keywords,
+        )
+
+        logger.debug(
+            "Text event recorded: type={}, sentiment={}, confusion={}",
+            event.text_type,
+            result.sentiment_label,
+            result.confusion_label,
+        )
+        return result
 
     # ------------------------------------------------------------------
     # Step 2 — Webcam signal injection

@@ -144,3 +144,12 @@ from tests.conftest_graph import (  # noqa: E402, F401
     mock_graph_manager,
     seeded_graph,
 )
+
+
+# =====================================================================
+# Step 4 — NLP fixtures (re-export from conftest_nlp)
+# =====================================================================
+from tests.conftest_nlp import (  # noqa: E402, F401
+    nlp_pipeline,
+    text_event,
+)
