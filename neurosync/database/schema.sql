@@ -122,6 +122,34 @@ CREATE TABLE IF NOT EXISTS session_summaries (
     FOREIGN KEY (session_id) REFERENCES sessions(session_id)
 );
 
+-- Scheduled reviews table (Step 8 — Spaced Repetition)
+CREATE TABLE IF NOT EXISTS scheduled_reviews (
+    review_id TEXT PRIMARY KEY,
+    student_id TEXT NOT NULL,
+    concept_id TEXT NOT NULL,
+    review_at REAL NOT NULL,
+    review_number INTEGER NOT NULL,
+    interval_type TEXT,
+    predicted_retention REAL,
+    completed INTEGER DEFAULT 0,
+    completed_at REAL,
+    actual_score REAL,
+    created_at REAL DEFAULT (unixepoch('now', 'subsec'))
+);
+
+-- Forgetting curves table (Step 8)
+CREATE TABLE IF NOT EXISTS forgetting_curves (
+    curve_id TEXT PRIMARY KEY,
+    student_id TEXT NOT NULL,
+    concept_id TEXT NOT NULL,
+    tau_days REAL NOT NULL,
+    r0 REAL NOT NULL,
+    confidence REAL,
+    data_points INTEGER,
+    fitted_at REAL,
+    UNIQUE(student_id, concept_id)
+);
+
 -- Indexes for fast queries
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, timestamp);
 CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type, timestamp);
@@ -129,3 +157,5 @@ CREATE INDEX IF NOT EXISTS idx_snapshots_session ON signal_snapshots(session_id,
 CREATE INDEX IF NOT EXISTS idx_attempts_student ON question_attempts(student_id, concept_id);
 CREATE INDEX IF NOT EXISTS idx_mastery_student ON mastery_records(student_id, next_review_at);
 CREATE INDEX IF NOT EXISTS idx_summaries_student ON session_summaries(student_id, start_time_of_day);
+CREATE INDEX IF NOT EXISTS idx_reviews_student_time ON scheduled_reviews(student_id, review_at);
+CREATE INDEX IF NOT EXISTS idx_reviews_pending ON scheduled_reviews(student_id, completed, review_at);

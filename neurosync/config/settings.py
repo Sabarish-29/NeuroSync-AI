@@ -307,6 +307,45 @@ CONTENT_GENERATION_CONFIG: dict[str, object] = {
 }
 
 
+# =============================================================================
+# Spaced Repetition Engine (Step 8)
+# =============================================================================
+SPACED_REPETITION_CONFIG: dict[str, float | int | str] = {
+    # Forgetting-curve fitting
+    "DEFAULT_TAU_DAYS": 3.0,              # default decay constant when <3 data points
+    "MIN_DATA_POINTS_FOR_FIT": 3,
+    "TAU_LOWER_BOUND": 0.1,               # days
+    "TAU_UPPER_BOUND": 30.0,              # days
+    "CURVE_FIT_MAX_ITERATIONS": 5000,
+
+    # Review scheduling
+    "REVIEW_THRESHOLD": 0.70,             # schedule review before retention drops below this
+    "SAFETY_BUFFER_DAYS": 1.0,            # review this many days BEFORE predicted threshold
+    "FIRST_REVIEW_HOURS": 2,              # hours after mastery for 1st review
+
+    # Timing
+    "SLEEP_OBSERVATION_WINDOW_DAYS": 14,
+    "DEFAULT_BEDTIME_HOUR": 22.0,         # 10 PM
+    "SLEEP_WINDOW_MINUTES_BEFORE": 60,
+    "CIRCADIAN_MIN_SESSIONS": 20,
+    "CIRCADIAN_DEFAULT_PEAK_START": 14.0,  # 2 PM
+    "CIRCADIAN_DEFAULT_PEAK_END": 17.0,    # 5 PM
+    "CIRCADIAN_WINDOW_HOURS": 3,
+
+    # Quiz generation
+    "QUIZ_QUESTIONS_PER_REVIEW": 3,
+    "QUIZ_SECONDS_PER_QUESTION": 60,
+
+    # Sleep-window eligibility
+    "SLEEP_MASTERY_LOW": 0.60,
+    "SLEEP_MASTERY_HIGH": 0.85,
+
+    # Notifications
+    "NOTIFICATION_TITLE": "NeuroSync Review",
+    "NOTIFICATION_TIMEOUT_SECONDS": 30,
+}
+
+
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
     for source in (BEHAVIORAL_THRESHOLDS, WEBCAM_THRESHOLDS, KNOWLEDGE_THRESHOLDS, NLP_THRESHOLDS):

@@ -194,3 +194,16 @@ from tests.conftest_fusion import (  # noqa: E402, F401
     gap_state,
     plateau_state,
 )
+
+# Step 8 — Spaced-repetition fixtures (re-export from conftest_spaced_rep)
+# ========================================================================
+from tests.conftest_spaced_rep import (  # noqa: E402, F401
+    sr_db,
+    fitter,
+    predictor,
+    quiz_gen,
+    scheduler,
+    sample_retention_4pts,
+    sample_retention_2pts,
+    fitted_curve,
+)
