@@ -239,6 +239,74 @@ INTERVENTION_COST_LIMITS: dict[str, float | int] = {
 }
 
 
+# =============================================================================
+# Content Generation Pipeline (Step 7)
+# =============================================================================
+CONTENT_GENERATION_CONFIG: dict[str, object] = {
+    # PDF Parsing
+    "PDF_MAX_PAGES": 200,
+    "PDF_MIN_TEXT_LENGTH": 50,
+    "PDF_TABLE_STRATEGY": "text",           # pdfplumber table strategy
+
+    # Concept Extraction (GPT-4)
+    "CONCEPT_EXTRACTION_MODEL": "gpt-4-turbo-preview",
+    "CONCEPT_EXTRACTION_MAX_TOKENS": 2000,
+    "CONCEPT_EXTRACTION_TEMPERATURE": 0.3,
+    "MAX_CONCEPTS_PER_CHUNK": 15,
+    "CHUNK_SIZE_CHARS": 4000,
+    "CHUNK_OVERLAP_CHARS": 200,
+
+    # Slide Generation
+    "SLIDES_MAX_PER_CONCEPT": 3,
+    "SLIDES_FONT_SIZE_TITLE": 32,
+    "SLIDES_FONT_SIZE_BODY": 18,
+    "SLIDES_WIDTH_INCHES": 13.333,
+    "SLIDES_HEIGHT_INCHES": 7.5,
+
+    # Script / Narration
+    "SCRIPT_MODEL": "gpt-4-turbo-preview",
+    "SCRIPT_MAX_TOKENS": 1500,
+    "SCRIPT_TEMPERATURE": 0.7,
+    "TTS_MODEL": "tts-1",
+    "TTS_VOICE": "alloy",
+    "TTS_SPEED": 1.0,
+
+    # Diagram (DALL-E)
+    "DIAGRAM_MODEL": "dall-e-3",
+    "DIAGRAM_SIZE": "1024x1024",
+    "DIAGRAM_QUALITY": "standard",
+
+    # Video Assembly
+    "VIDEO_FPS": 24,
+    "VIDEO_RESOLUTION": (1920, 1080),
+    "VIDEO_CODEC": "libx264",
+    "VIDEO_AUDIO_CODEC": "aac",
+    "SLIDE_DURATION_SECONDS": 8,
+
+    # Story Generation
+    "STORY_MODEL": "gpt-4-turbo-preview",
+    "STORY_MAX_TOKENS": 2000,
+    "STORY_TEMPERATURE": 0.8,
+
+    # Quiz Generation
+    "QUIZ_MODEL": "gpt-4-turbo-preview",
+    "QUIZ_MAX_TOKENS": 2000,
+    "QUIZ_TEMPERATURE": 0.5,
+    "QUIZ_QUESTIONS_PER_CONCEPT": 3,
+    "QUIZ_DIFFICULTY_LEVELS": ["easy", "medium", "hard"],
+
+    # Progress Tracking
+    "PROGRESS_UPDATE_INTERVAL_SECONDS": 2,
+
+    # Output directories (relative to PROJECT_ROOT)
+    "OUTPUT_DIR": "output",
+    "VIDEO_SUBDIR": "videos",
+    "SLIDES_SUBDIR": "slides",
+    "NOTES_SUBDIR": "notes",
+    "QUIZ_SUBDIR": "quizzes",
+}
+
+
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
     for source in (BEHAVIORAL_THRESHOLDS, WEBCAM_THRESHOLDS, KNOWLEDGE_THRESHOLDS, NLP_THRESHOLDS):

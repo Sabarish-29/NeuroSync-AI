@@ -32,9 +32,13 @@ textblob>=0.18.0
 # GPT-4 Intervention Engine (Step 6)
 openai>=1.0.0
 
+# Content Generation Pipeline (Step 7)
+pdfplumber>=0.9.0
+python-pptx>=0.6.21
+moviepy>=1.0.3
+pillow>=10.0.0
+
 # Future steps (commented out — install when needed)
 # langchain>=0.0.300       # Step 5
-# python-pptx>=0.6.21      # Step 7
-# moviepy>=1.0.3           # Step 7
 # pyserial>=3.5            # Step 10
 # mne>=1.5.0               # Step 10

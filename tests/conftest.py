@@ -164,3 +164,17 @@ from tests.conftest_interventions import (  # noqa: E402, F401
     cost_tracker,
     generator,
 )
+
+# =====================================================================
+# Step 7 — Content generation fixtures (re-export from conftest_content)
+# =====================================================================
+from tests.conftest_content import (  # noqa: E402, F401
+    sample_concepts,
+    mock_openai_client,
+    concept_extractor,
+    script_generator,
+    story_generator,
+    quiz_generator,
+    diagram_generator,
+    tts_engine,
+)
