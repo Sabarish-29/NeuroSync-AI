@@ -217,6 +217,28 @@ NLP_THRESHOLDS: dict[str, float | int] = {
 }
 
 
+# =============================================================================
+# OpenAI / GPT-4 Configuration (Step 6)
+# =============================================================================
+OPENAI_CONFIG: dict[str, object] = {
+    "API_KEY_ENV_VAR": "OPENAI_API_KEY",
+    "MODEL_PRODUCTION": "gpt-4-turbo-preview",
+    "MODEL_FALLBACK": "gpt-3.5-turbo",
+    "MAX_TOKENS_PER_REQUEST": 200,
+    "TEMPERATURE": 0.7,
+    "TIMEOUT_SECONDS": 10,
+    "MAX_RETRIES": 3,
+}
+
+INTERVENTION_COST_LIMITS: dict[str, float | int] = {
+    "SESSION_LIMIT_USD": 5.00,
+    "STUDENT_LIFETIME_LIMIT_USD": 50.00,
+    "CACHE_MAX_SIZE": 10000,
+    "CACHE_TTL_DAYS": 30,
+    "RATE_LIMIT_PER_MINUTE": 60,
+}
+
+
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
     for source in (BEHAVIORAL_THRESHOLDS, WEBCAM_THRESHOLDS, KNOWLEDGE_THRESHOLDS, NLP_THRESHOLDS):

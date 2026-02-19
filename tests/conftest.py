@@ -153,3 +153,14 @@ from tests.conftest_nlp import (  # noqa: E402, F401
     nlp_pipeline,
     text_event,
 )
+
+
+# =====================================================================
+# Step 6 — Intervention fixtures (re-export from conftest_interventions)
+# =====================================================================
+from tests.conftest_interventions import (  # noqa: E402, F401
+    mock_openai_response,
+    cache_manager,
+    cost_tracker,
+    generator,
+)
