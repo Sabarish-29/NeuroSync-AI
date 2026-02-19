@@ -207,3 +207,12 @@ from tests.conftest_spaced_rep import (  # noqa: E402, F401
     sample_retention_2pts,
     fitted_curve,
 )
+
+# Step 9 — Readiness fixtures (re-export from conftest_readiness)
+# ================================================================
+from tests.conftest_readiness import (  # noqa: E402, F401
+    low_anxiety_responses,
+    high_anxiety_responses,
+    normal_warmup_answers,
+    slow_warmup_answers,
+)

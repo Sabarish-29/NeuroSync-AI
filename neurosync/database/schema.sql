@@ -150,6 +150,27 @@ CREATE TABLE IF NOT EXISTS forgetting_curves (
     UNIQUE(student_id, concept_id)
 );
 
+-- Readiness checks table (Step 9)
+CREATE TABLE IF NOT EXISTS readiness_checks (
+    check_id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    lesson_topic TEXT NOT NULL,
+    timestamp REAL NOT NULL,
+    readiness_score REAL,
+    anxiety_score REAL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    self_report_anxiety REAL,
+    physiological_anxiety REAL,
+    behavioral_anxiety REAL,
+    breathing_offered INTEGER DEFAULT 0,
+    breathing_completed INTEGER DEFAULT 0,
+    manual_override INTEGER DEFAULT 0,
+    lesson_started INTEGER DEFAULT 0,
+    elapsed_time_seconds REAL,
+    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+);
+
 -- Indexes for fast queries
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, timestamp);
 CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type, timestamp);
@@ -159,3 +180,4 @@ CREATE INDEX IF NOT EXISTS idx_mastery_student ON mastery_records(student_id, ne
 CREATE INDEX IF NOT EXISTS idx_summaries_student ON session_summaries(student_id, start_time_of_day);
 CREATE INDEX IF NOT EXISTS idx_reviews_student_time ON scheduled_reviews(student_id, review_at);
 CREATE INDEX IF NOT EXISTS idx_reviews_pending ON scheduled_reviews(student_id, completed, review_at);
+CREATE INDEX IF NOT EXISTS idx_readiness_student ON readiness_checks(student_id, timestamp);

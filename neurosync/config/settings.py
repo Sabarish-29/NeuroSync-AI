@@ -345,6 +345,47 @@ SPACED_REPETITION_CONFIG: dict[str, float | int | str] = {
     "NOTIFICATION_TIMEOUT_SECONDS": 30,
 }
 
+# =============================================================================
+# Pre-Lesson Readiness Protocol (Step 9)
+# =============================================================================
+READINESS_CONFIG: dict[str, float | int | str | list[str]] = {
+    # Self-report assessment
+    "SELF_REPORT_QUESTIONS": 3,           # familiarity, difficulty_perception, emotional_state
+
+    # Physiological assessment — blink rate norms (blinks/min)
+    "BLINK_RATE_LOW": 12.0,               # below = very calm
+    "BLINK_RATE_NORMAL_HIGH": 20.0,       # 12-20 = normal
+    "BLINK_RATE_ELEVATED": 25.0,          # 20-25 = mildly elevated
+    # >25 scales linearly toward 1.0 anxiety (capped at 40 bpm)
+    "BLINK_RATE_ANXIETY_CAP": 40.0,
+
+    # Behavioral warmup assessment
+    "WARMUP_QUESTIONS": 3,
+    "RESPONSE_TIME_NORM_SECONDS": 8.0,    # expected mean response time
+    "RESPONSE_TIME_SLOW_SECONDS": 15.0,   # clearly slow / distracted
+    "CV_THRESHOLD": 0.50,                 # coefficient of variation threshold
+
+    # Readiness scoring weights (must sum to 1.0)
+    "WEIGHT_SELF_REPORT": 0.50,
+    "WEIGHT_PHYSIOLOGICAL": 0.30,
+    "WEIGHT_BEHAVIORAL": 0.20,
+
+    # Thresholds
+    "READY_THRESHOLD": 0.60,              # readiness >= this → proceed
+    "ANXIETY_HIGH_THRESHOLD": 0.65,       # anxiety >= this → offer breathing
+
+    # Breathing exercise timing (seconds)
+    "BREATHE_INHALE": 4.0,
+    "BREATHE_HOLD": 4.0,
+    "BREATHE_EXHALE": 6.0,
+    "BREATHE_CYCLES": 8,
+    # total = (4+4+6) * 8 = 112 seconds
+
+    # Post-intervention
+    "RECHECK_AFTER_BREATHING": True,
+    "MAX_RECHECKS": 1,
+}
+
 
 def get_threshold(key: str) -> float:
     """Get a threshold value by key, raising KeyError if not found."""
