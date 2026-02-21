@@ -35,6 +35,9 @@ class ResizeObserverMock {
 }
 window.ResizeObserver = ResizeObserverMock as any;
 
+// Mock HTMLCanvasElement.getContext (jsdom does not implement canvas)
+HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(null) as any;
+
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   value: vi.fn().mockImplementation((query: string) => ({

@@ -235,6 +235,8 @@ describe('UploadPDF', () => {
   });
 
   test('displays results after completion', async () => {
+    vi.useFakeTimers();
+
     render(<UploadPDF />);
 
     const input = screen.getByTestId('pdf-input');
@@ -242,15 +244,12 @@ describe('UploadPDF', () => {
 
     await act(async () => {
       fireEvent.change(input, { target: { files: [file] } });
+      await vi.runAllTimersAsync();
     });
 
-    // Wait for the simulated generation to complete
-    await waitFor(
-      () => {
-        expect(screen.getByText('Course Generated!')).toBeInTheDocument();
-      },
-      { timeout: 10000 },
-    );
+    expect(screen.getByText('Course Generated!')).toBeInTheDocument();
+
+    vi.useRealTimers();
   });
 });
 
