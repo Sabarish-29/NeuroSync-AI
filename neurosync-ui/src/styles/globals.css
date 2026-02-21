@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base layer ───────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    --color-primary: #6366f1;
+    --color-primary-light: #818cf8;
+    --color-primary-dark: #4338ca;
+    --color-surface: #0f1018;
+    --color-surface-card: #1a1b2e;
+    --color-surface-hover: #252640;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6;
+  }
+
+  body {
+    @apply bg-surface-dark text-white;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neurosync-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neurosync-600;
+  }
+}
+
+/* ─── Component layer ──────────────────────────────────────────────────────── */
+
+@layer components {
+  .btn-primary {
+    @apply bg-neurosync-600 hover:bg-neurosync-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-card hover:bg-surface-hover text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 border border-neurosync-700;
+  }
+
+  .btn-success {
+    @apply bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+  }
+
+  .card {
+    @apply bg-surface-card rounded-xl p-6 shadow-lg border border-neurosync-900/30;
+  }
+
+  .card-hover {
+    @apply card hover:border-neurosync-700/50 hover:shadow-neurosync-900/20 transition-all duration-200;
+  }
+
+  .signal-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .signal-good {
+    @apply signal-badge bg-green-900/30 text-green-400 border border-green-700/30;
+  }
+
+  .signal-warning {
+    @apply signal-badge bg-yellow-900/30 text-yellow-400 border border-yellow-700/30;
+  }
+
+  .signal-danger {
+    @apply signal-badge bg-red-900/30 text-red-400 border border-red-700/30;
+  }
+
+  .input-field {
+    @apply bg-surface-dark border border-neurosync-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neurosync-500 focus:border-transparent transition-all;
+  }
+}

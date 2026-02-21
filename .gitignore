@@ -75,3 +75,4 @@ build/
 *.o
 *.so
 *.dll
+temp_slides/
