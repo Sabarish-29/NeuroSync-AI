@@ -120,7 +120,7 @@ class ContentPipeline:
                  config: Optional[PipelineConfig] = None,
                  progress_callback: Optional[Callable] = None) -> None:
         self.config = config or PipelineConfig()
-        self.client = openai_client
+        self.client = openai_client or self._create_client()
         self.tracker = ProgressTracker(callback=progress_callback)
 
         # Initialize sub-components
@@ -164,6 +164,45 @@ class ContentPipeline:
         self.markdown_generator = MarkdownGenerator()
         self.story_exporter = StoryExporter()
         self.quiz_exporter = QuizExporter()
+
+    @staticmethod
+    def _create_client() -> Any:
+        """Create an LLM client based on environment configuration.
+
+        Tries Groq (FREE) first, falls back to OpenAI.
+        Returns None if no provider is configured.
+        """
+        import os
+
+        provider = os.getenv("LLM_PROVIDER", "openai")
+        groq_key = os.getenv("GROQ_API_KEY", "")
+        openai_key = os.getenv("OPENAI_API_KEY", "")
+
+        if provider == "groq" and groq_key:
+            try:
+                from openai import AsyncOpenAI
+
+                # Groq is OpenAI-compatible; use the OpenAI SDK pointed at Groq
+                client = AsyncOpenAI(
+                    api_key=groq_key,
+                    base_url="https://api.groq.com/openai/v1",
+                )
+                logger.info("ContentPipeline using Groq client (FREE)")
+                return client
+            except Exception as e:
+                logger.warning("Groq client creation failed: {}", e)
+
+        if openai_key:
+            try:
+                from openai import AsyncOpenAI
+
+                client = AsyncOpenAI(api_key=openai_key)
+                logger.info("ContentPipeline using OpenAI client")
+                return client
+            except Exception as e:
+                logger.warning("OpenAI client creation failed: {}", e)
+
+        return None
 
     async def process_pdf(self, pdf_path: str | Path) -> PipelineResult:
         """

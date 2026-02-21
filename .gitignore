@@ -66,6 +66,16 @@ data/
 .env.*
 !.env.example
 config/secrets.*
+*.pem
+*.key
+credentials.json
+service-account*.json
+
+# =========================
+# Generated sample content
+# =========================
+sample_content/generated/
+sample_content/source_pdfs/*.pdf
 
 # =========================
 # Build / Compiled output

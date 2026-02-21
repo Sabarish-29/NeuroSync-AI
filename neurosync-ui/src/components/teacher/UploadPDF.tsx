@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { Upload, CheckCircle, Loader, FileText, AlertTriangle } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Upload, CheckCircle, Loader, FileText, AlertTriangle, Circle } from 'lucide-react';
 import { ProgressBar } from '../shared/ProgressBar';
+import { ErrorAlert } from '../shared/ErrorAlert';
 
 interface GenerationResult {
   task_id: string;
@@ -11,6 +12,20 @@ interface GenerationResult {
   video_duration: string;
   formats_generated: string[];
 }
+
+const GENERATION_STEPS = [
+  { id: 1, label: "Parsing PDF", progress: 8 },
+  { id: 2, label: "Cleaning text", progress: 15 },
+  { id: 3, label: "Analyzing structure", progress: 22 },
+  { id: 4, label: "Extracting concepts (AI)", progress: 35 },
+  { id: 5, label: "Generating slide outlines", progress: 45 },
+  { id: 6, label: "Creating narration scripts (AI)", progress: 58 },
+  { id: 7, label: "Generating audio (TTS)", progress: 70 },
+  { id: 8, label: "Rendering slides to images", progress: 80 },
+  { id: 9, label: "Assembling video", progress: 90 },
+  { id: 10, label: "Creating quiz (AI)", progress: 95 },
+  { id: 11, label: "Finalizing outputs", progress: 100 },
+];
 
 export const UploadPDF: React.FC = () => {
   const [uploading, setUploading] = useState(false);
@@ -27,26 +42,16 @@ export const UploadPDF: React.FC = () => {
     setResult(null);
 
     // Subscribe to progress updates if in Electron
-    const unsubscribe = window.electronAPI?.onGenerationProgress((data) => {
+    const unsubscribe = window.electronAPI?.onGenerationProgress((data: { progress: number; stage?: string; message?: string }) => {
       setProgress(data.progress);
       setStage(data.stage || data.message || '');
     });
 
     try {
       // Simulate progress for demo (in production, use actual API)
-      const stages = [
-        'Parsing PDF...',
-        'Extracting concepts...',
-        'Generating slides...',
-        'Writing notes...',
-        'Creating story...',
-        'Generating quiz...',
-        'Finalizing...',
-      ];
-
-      for (let i = 0; i < stages.length; i++) {
-        setStage(stages[i]);
-        setProgress(((i + 1) / stages.length) * 100);
+      for (let i = 0; i < GENERATION_STEPS.length; i++) {
+        setStage(GENERATION_STEPS[i].label);
+        setProgress(GENERATION_STEPS[i].progress);
         await new Promise((r) => setTimeout(r, 600));
       }
 
@@ -60,7 +65,21 @@ export const UploadPDF: React.FC = () => {
         formats_generated: ['slides', 'notes', 'story', 'quiz'],
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed');
+      let errorMessage = 'Upload failed. Please try again.';
+
+      if (err instanceof Error) {
+        if (err.message?.includes('GROQ_API_KEY')) {
+          errorMessage = 'Groq API key not configured. Please add GROQ_API_KEY to your .env file.';
+        } else if (err.message?.includes('rate limit')) {
+          errorMessage = 'API rate limit reached. Please wait a moment and try again.';
+        } else if (err.message?.includes('ECONNREFUSED')) {
+          errorMessage = 'Cannot connect to backend. Please ensure the server is running.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setUploading(false);
       if (unsubscribe) unsubscribe();
@@ -81,6 +100,12 @@ export const UploadPDF: React.FC = () => {
     }
   };
 
+  const handleCancelUpload = () => {
+    setUploading(false);
+    setProgress(0);
+    setStage('');
+  };
+
   const reset = () => {
     setResult(null);
     setProgress(0);
@@ -88,9 +113,34 @@ export const UploadPDF: React.FC = () => {
     setError(null);
   };
 
+  // Trigger confetti on success
+  useEffect(() => {
+    if (result && result.task_id) {
+      try {
+        import('canvas-confetti').then((confetti) => {
+          confetti.default({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#00bfff', '#00ff88', '#ff8c00'],
+          });
+        });
+      } catch {
+        // confetti not installed, skip
+      }
+    }
+  }, [result]);
+
   return (
     <div className="card max-w-2xl mx-auto">
-      {/* Idle state — file picker */}
+      {/* Error alert overlay */}
+      <ErrorAlert
+        error={error}
+        onDismiss={() => setError(null)}
+        onRetry={reset}
+      />
+
+      {/* Idle state -- file picker */}
       {!uploading && !result && !error && (
         <div
           className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
@@ -106,9 +156,9 @@ export const UploadPDF: React.FC = () => {
           <h3 className="text-xl font-semibold mb-2">Upload PDF Textbook Chapter</h3>
           <p className="text-gray-400 mb-6 leading-relaxed">
             NeuroSync will automatically generate:<br />
-            <span className="text-neurosync-400">Slides</span> {' · '}
-            <span className="text-neurosync-400">Written Notes</span> {' · '}
-            <span className="text-neurosync-400">Story Explanation</span> {' · '}
+            <span className="text-neurosync-400">Slides</span> {' \u00B7 '}
+            <span className="text-neurosync-400">Written Notes</span> {' \u00B7 '}
+            <span className="text-neurosync-400">Story Explanation</span> {' \u00B7 '}
             <span className="text-neurosync-400">Quiz Bank</span>
           </p>
           <label className="btn-primary cursor-pointer inline-block">
@@ -128,13 +178,76 @@ export const UploadPDF: React.FC = () => {
         </div>
       )}
 
-      {/* Uploading state */}
+      {/* Uploading state with step-by-step progress */}
       {uploading && (
-        <div className="text-center py-8">
-          <Loader className="w-16 h-16 mx-auto mb-4 animate-spin text-neurosync-500" />
-          <h3 className="text-xl font-semibold mb-4">Generating Course Content...</h3>
-          <ProgressBar value={progress} color="purple" size="lg" />
-          <p className="text-gray-400 mt-3">{stage}</p>
+        <div className="py-8">
+          <div className="text-center mb-8">
+            <Loader className="w-16 h-16 mx-auto mb-4 animate-spin text-neurosync-500" />
+
+            <h3 className="text-2xl font-bold mb-2">
+              Generating Course Content...
+            </h3>
+
+            <p className="text-gray-400 mb-6">
+              This will take approximately 10-12 minutes
+            </p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="w-full bg-gray-800 rounded-full h-6 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-neurosync-600 to-neurosync-400 h-6 rounded-full transition-all duration-500 ease-out flex items-center justify-center text-white text-sm font-semibold"
+                style={{ width: `${progress}%` }}
+              >
+                {Math.round(progress)}%
+              </div>
+            </div>
+          </div>
+
+          {/* Current Step List */}
+          <div className="space-y-3">
+            {GENERATION_STEPS.map((step) => {
+              const isComplete = progress >= step.progress;
+              const isCurrent = progress < step.progress &&
+                               (step.id === 1 || progress >= GENERATION_STEPS[step.id - 2].progress);
+
+              return (
+                <div
+                  key={step.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                    isComplete
+                      ? 'bg-green-900/20 text-green-400'
+                      : isCurrent
+                      ? 'bg-neurosync-900/20 text-neurosync-400 animate-pulse'
+                      : 'bg-gray-900/20 text-gray-600'
+                  }`}
+                >
+                  {isComplete ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : isCurrent ? (
+                    <Loader className="w-5 h-5 animate-spin text-neurosync-400" />
+                  ) : (
+                    <Circle className="w-5 h-5 text-gray-700" />
+                  )}
+
+                  <span className="font-medium">{step.label}</span>
+
+                  {isComplete && (
+                    <CheckCircle className="w-4 h-4 ml-auto text-green-600" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Cancel Button */}
+          <button
+            onClick={handleCancelUpload}
+            className="mt-6 w-full py-2 border border-gray-700 rounded-lg hover:bg-gray-800 transition-colors text-gray-400"
+          >
+            Cancel Upload
+          </button>
         </div>
       )}
 

@@ -394,3 +394,38 @@ def get_threshold(key: str) -> float:
         if value is not None:
             return float(value)
     raise KeyError(key)
+
+
+# =============================================================================
+# LLM Provider Configuration (Step 13 - Free Migration)
+# =============================================================================
+LLM_CONFIG: dict[str, object] = {
+    "PROVIDER": os.getenv("LLM_PROVIDER", "groq"),
+    "GROQ_API_KEY": os.getenv("GROQ_API_KEY"),
+    "GROQ_MODEL": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+    "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
+    "OPENAI_MODEL": os.getenv("OPENAI_MODEL", "gpt-4o"),
+}
+
+# =============================================================================
+# TTS Provider Configuration (Step 13 - Free Migration)
+# =============================================================================
+TTS_CONFIG: dict[str, object] = {
+    "PROVIDER": os.getenv("TTS_PROVIDER", "gtts"),
+    "LANGUAGE": os.getenv("TTS_LANGUAGE", "en"),
+    "VOICE_SPEED": os.getenv("TTS_VOICE_SPEED", "normal"),
+}
+
+
+def get_llm_provider():
+    """Get configured LLM provider via factory."""
+    from neurosync.llm.factory import LLMProviderFactory
+
+    return LLMProviderFactory.create_provider()
+
+
+def get_tts_provider():
+    """Get configured TTS provider via factory."""
+    from neurosync.tts.factory import TTSProviderFactory
+
+    return TTSProviderFactory.create_provider()

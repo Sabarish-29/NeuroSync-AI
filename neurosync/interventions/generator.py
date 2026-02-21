@@ -1,6 +1,7 @@
 """
-NeuroSync AI — Main GPT-4 Intervention Content Generator.
+NeuroSync AI — Main Intervention Content Generator.
 
+Supports Groq (FREE) and OpenAI providers via factory pattern.
 Handles cache lookups, rate limiting, cost tracking, retries, and fallbacks.
 """
 
@@ -88,14 +89,30 @@ class InterventionGenerator:
     ) -> None:
         import os
 
-        resolved_key = api_key or os.getenv(str(OPENAI_CONFIG["API_KEY_ENV_VAR"]), "")
-        self._model = model or str(OPENAI_CONFIG["MODEL_PRODUCTION"])
+        # Determine provider and resolve API key/model
+        self._llm_provider_type = os.getenv("LLM_PROVIDER", "openai")
+        groq_key = os.getenv("GROQ_API_KEY", "")
+
+        if api_key:
+            # Explicit API key passed (backward compatible path)
+            resolved_key = api_key
+            self._model = model or str(OPENAI_CONFIG["MODEL_PRODUCTION"])
+        elif self._llm_provider_type == "groq" and groq_key:
+            # Use Groq (FREE)
+            resolved_key = groq_key
+            self._model = model or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        else:
+            # Fall back to OpenAI
+            resolved_key = os.getenv(str(OPENAI_CONFIG["API_KEY_ENV_VAR"]), "")
+            self._model = model or str(OPENAI_CONFIG["MODEL_PRODUCTION"])
+            self._llm_provider_type = "openai"
+
         self._max_tokens = int(OPENAI_CONFIG["MAX_TOKENS_PER_REQUEST"])
         self._temperature = float(OPENAI_CONFIG["TEMPERATURE"])
         self._timeout = float(OPENAI_CONFIG["TIMEOUT_SECONDS"])
         self._max_retries = int(OPENAI_CONFIG["MAX_RETRIES"])
 
-        # OpenAI client — lazy-initialized so tests can mock it
+        # Client — lazy-initialized so tests can mock it
         self._api_key = resolved_key
         self._client: Any = None
 
@@ -108,15 +125,24 @@ class InterventionGenerator:
         self.request_count = 0
         self.request_window_start = time.time()
 
-        logger.info("InterventionGenerator initialised (model={})", self._model)
+        logger.info(
+            "InterventionGenerator initialised (provider={}, model={})",
+            self._llm_provider_type, self._model,
+        )
 
     # ── lazy client ─────────────────────────────────────────────────
 
     def _get_client(self) -> Any:
         if self._client is None:
-            from openai import AsyncOpenAI
+            if self._llm_provider_type == "groq":
+                from groq import AsyncGroq
 
-            self._client = AsyncOpenAI(api_key=self._api_key)
+                self._client = AsyncGroq(api_key=self._api_key)
+                logger.info("Using Groq async client (FREE)")
+            else:
+                from openai import AsyncOpenAI
+
+                self._client = AsyncOpenAI(api_key=self._api_key)
         return self._client
 
     # ── public API ──────────────────────────────────────────────────
