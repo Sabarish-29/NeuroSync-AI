@@ -54,9 +54,9 @@ export const LearningInterface: React.FC<LearningInterfaceProps> = ({
     (event: Omit<LearningEvent, 'session_id'>) => {
       if (!sessionId) return;
       window.electronAPI?.sendEvent({
-        session_id: sessionId,
         ...event,
-      });
+        session_id: sessionId,
+      } as LearningEvent);
     },
     [sessionId],
   );

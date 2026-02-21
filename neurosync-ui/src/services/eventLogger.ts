@@ -15,11 +15,11 @@ export class EventLogger {
    * Log a learning event. Buffers and flushes periodically.
    */
   log(event: Omit<LearningEvent, 'session_id'>): void {
-    const fullEvent: LearningEvent = {
+    const fullEvent = {
       session_id: this.sessionId,
       ...event,
-      timestamp: event.timestamp || Date.now(),
-    };
+      timestamp: (event.timestamp as number | undefined) ?? Date.now(),
+    } as LearningEvent;
 
     this.buffer.push(fullEvent);
 
