@@ -20,6 +20,7 @@ from typing import Optional
 from loguru import logger
 
 from neurosync.fusion.state import FusionState
+from neurosync.utils.patent_logger import log_moment_detection, log_eeg_quality_decision
 
 
 @dataclass
@@ -109,6 +110,9 @@ class BaseMomentDetector(ABC):
                         "{}: EEG boost +{:.2f} (quality={:.2f})",
                         self.moment_id, eeg_boost, quality,
                     )
+                log_eeg_quality_decision(quality, 0.6, "use")
+            else:
+                log_eeg_quality_decision(quality, 0.6, "fallback", "quality below threshold")
 
         total = min(1.0, primary + eeg_boost)
 
@@ -116,7 +120,7 @@ class BaseMomentDetector(ABC):
         if total < self.base_threshold:
             return None
 
-        return MomentDetectionResult(
+        result = MomentDetectionResult(
             moment_id=self.moment_id,
             detected=True,
             confidence=total,
@@ -134,6 +138,19 @@ class BaseMomentDetector(ABC):
                 "eeg_quality": state.eeg.quality if state.eeg else None,
             },
         )
+
+        # Patent evidence: log successful detection
+        log_moment_detection(
+            moment_id=self.moment_id,
+            detected=True,
+            primary_confidence=primary,
+            eeg_boost=eeg_boost,
+            total_confidence=total,
+            signals_used=result.signals_used,
+            metadata=result.metadata,
+        )
+
+        return result
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(id={self.moment_id}, threshold={self.base_threshold})"

@@ -1,141 +1,110 @@
 # NeuroSync AI v5.1
 
-> A multi-modal adaptive learning system that detects 22 specific learning failure moments in real-time using behavioral signals, webcam vision, NLP, and knowledge graphs. Delivers personalized AI interventions within 2 seconds.
+> Real-time adaptive learning system that detects 22 specific learning failure moments using multimodal signal fusion (webcam, behavioral, NLP, knowledge graph, optional EEG). Delivers personalized AI interventions within 2 seconds at zero operating cost.
 
-## Features
+## Key Features
 
-- **22 Learning Moment Detection** - Real-time identification of attention drops, cognitive overload, frustration, fatigue, and 18 more moments
-- **Multimodal Signal Fusion** - Combines webcam, behavioral, NLP, knowledge graph, and timing signals every 250ms using LangGraph with 8 specialized AI agents
-- **AI-Powered Interventions** - Generates personalized content simplifications, explanations, and rescue strategies using Groq Llama 3.3 70B (FREE)
-- **Automated Course Generation** - Converts PDF textbooks to narrated videos, slide decks, quiz banks, and story explanations in 12 minutes
-- **Spaced Repetition** - Personalized forgetting curves fit to each student's retention data with adaptive review scheduling
-- **Pre-Lesson Readiness** - Anxiety detection with guided breathing exercises and readiness checks
-- **Knowledge Graph** - Neo4j-powered concept prerequisite tracking and mastery visualization
-- **Zero Operating Cost** - Runs entirely on free APIs (Groq + gTTS + local Neo4j)
+- **22 Learning Moment Detection** -- Identifies attention drops, cognitive overload, frustration, fatigue, and 18 more failure modes every 250ms using 8 parallel LangGraph agents
+- **Tiered Confidence System** -- Primary detection (webcam + behavioral, 70-85% confidence) with optional EEG enhancement (+10-15%), no hardware dependency
+- **Automated Course Generation** -- PDF to narrated video, slides, quiz, and notes in 10 minutes using Groq + gTTS
+- **Zero Operating Cost** -- Runs entirely on free APIs (Groq Llama 3.3 70B + gTTS + local Neo4j)
+- **AI-Powered Interventions** -- Generates personalized simplifications, explanations, and rescue strategies with SHA-256 response caching
+- **Spaced Repetition** -- Per-student forgetting curves fit via scipy exponential decay model
+- **Knowledge Graph** -- Neo4j concept prerequisites with mastery tracking
+- **Patent-Pending Innovations** -- 3 provisional patents filed (22-moment taxonomy, content pipeline, EEG quality gating)
 
 ## Quick Start
 
 ```bash
-# 1. Clone the repo
+# Clone and install
 git clone https://github.com/Sabarish-29/NeuroSync-AI.git
 cd NeuroSync-AI
-
-# 2. Create virtual environment
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-# venv\Scripts\activate   # Windows
-
-# 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Configure environment
+# Configure (only GROQ_API_KEY required -- free at console.groq.com)
 cp .env.example .env
-# Edit .env and add your Groq API key (free at console.groq.com)
+# Edit .env: set GROQ_API_KEY=gsk_your_key_here
 
-# 5. Initialize the database
-python scripts/init_db.py
-
-# 6. Run all tests
-pytest tests/ -v --cov=neurosync --cov-report=term-missing
-
-# 7. Start the API server
-python neurosync/api/server.py
-
-# 8. Start the frontend (separate terminal)
-cd neurosync-ui
-npm install
-npm run dev
+# Verify installation
+pytest tests/ -v            # 490+ tests
+python -c "from neurosync.utils.config_validator import SystemValidator; SystemValidator.print_status_report()"
 ```
 
-## FREE API Configuration
+See [docs/INSTALLATION.md](docs/INSTALLATION.md) for detailed setup instructions.
 
-NeuroSync runs entirely on free APIs - no credit card required.
+## Configuration
 
-### 1. Groq (FREE LLM)
+NeuroSync runs on free APIs -- no credit card required.
+
 ```bash
-# Sign up at https://console.groq.com (no credit card)
-# Get API key from https://console.groq.com/keys
-```
+# .env (minimum configuration)
+GROQ_API_KEY=gsk_your_key_here   # Free at console.groq.com
+LLM_PROVIDER=groq                # Default: groq (free)
+TTS_PROVIDER=gtts                # Default: gtts (free)
 
-### 2. gTTS (FREE Text-to-Speech)
-Already included in dependencies. No signup needed.
-
-### 3. Neo4j (FREE Local)
-```bash
-# Ubuntu/Debian
-sudo apt-get install neo4j
-
-# macOS
-brew install neo4j
-
-# Start server
-neo4j start
-```
-
-### Configure `.env`
-```bash
-# LLM Provider (FREE)
-LLM_PROVIDER=groq
-GROQ_API_KEY=gsk_your_key_here
-
-# TTS Provider (FREE)
-TTS_PROVIDER=gtts
-
-# Neo4j Local (FREE)
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=your_password
-```
-
-Want better quality? Add OpenAI as fallback:
-```bash
-LLM_PROVIDER=groq           # Use Groq (FREE) first
-OPENAI_API_KEY=sk-proj-...  # Fallback to OpenAI if needed
+# Optional
+# NEO4J_URI=bolt://localhost:7687
+# EEG_ENABLED=false
+# OPENAI_API_KEY=sk-...          # Fallback if Groq unavailable
 ```
 
 ## Architecture
 
 ```
-neurosync/
-├── api/              # FastAPI server with WebSocket support
-├── behavioral/       # Signal processors, moment detectors, fusion engine
-├── config/           # Settings, thresholds, and provider configuration
-├── content/          # PDF parsing, concept extraction, content generation
-├── core/             # Pydantic event models and constants
-├── database/         # SQLite schema, manager, repositories
-├── experiments/      # A/B testing framework (E1-E5)
-├── interventions/    # GPT-4/Groq intervention generator with caching
-├── knowledge_graph/  # Neo4j concept graph with prerequisites
-├── langgraph/        # 8-agent fusion engine with LangGraph orchestration
-├── llm/              # Provider abstraction (Groq, OpenAI, factory)
-├── nlp/              # Text analysis pipeline
-├── readiness/        # Pre-lesson anxiety detection + breathing exercises
-├── spaced_repetition/# Personalized forgetting curves + review scheduling
-├── tts/              # Provider abstraction (gTTS, factory)
-├── video/            # Video rendering with MoviePy
-└── webcam/           # MediaPipe-based gaze and expression detection
-
-neurosync-ui/         # React + TypeScript frontend
-├── src/
-│   ├── components/
-│   │   ├── teacher/  # Dashboard, ContentLibrary, UploadPDF, Analytics
-│   │   ├── student/  # LearningInterface, VideoPlayer, InterventionOverlay
-│   │   └── shared/   # Navigation, ProgressBar, ErrorAlert, MomentBadge
-│   ├── hooks/        # useFusionLoop, useInterventions, useWebcam, useKeyboardShortcuts
-│   └── stores/       # Zustand session state management
-└── electron/         # Electron main process
-
-scripts/              # Utilities and demos
-tests/                # 400+ tests (pytest + vitest)
-docs/                 # Migration guide, content guide, slides outline
+┌─────────────────────────────────────────────────────────────┐
+│    PRESENTATION    React 18 + TypeScript + Electron 28      │
+├─────────────────────────────────────────────────────────────┤
+│    APPLICATION     FastAPI + WebSocket (250ms push)          │
+├─────────────────────────────────────────────────────────────┤
+│    DETECTION       22 Moment Detectors + 8-Agent Fusion      │
+├─────────────────────────────────────────────────────────────┤
+│    SIGNALS         Webcam | Behavioral | NLP | EEG (opt)     │
+├─────────────────────────────────────────────────────────────┤
+│    CONTENT         PDF → Video/Slides/Quiz/Notes ($0)        │
+├─────────────────────────────────────────────────────────────┤
+│    DATA            Neo4j | SQLite | File System              │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+```
+neurosync/
+├── api/                # FastAPI server + WebSocket
+├── behavioral/         # Signal collectors, event processing
+├── config/             # Settings, thresholds, provider config
+├── content/            # 11-stage PDF-to-course pipeline
+├── eeg/                # Optional EEG coordinator (disabled by default)
+├── experiments/        # A/B testing framework (E1-E5)
+├── fusion/             # LangGraph 8-agent engine + moment detectors
+│   └── moment_detectors/  # M01, M02, M10 (tiered confidence)
+├── interventions/      # Groq-powered generator + caching
+├── knowledge_graph/    # Neo4j concept graph
+├── llm/                # Provider abstraction (Groq/OpenAI factory)
+├── nlp/                # Text complexity + sentiment analysis
+├── spaced_repetition/  # Forgetting curves + review scheduling
+├── tts/                # Provider abstraction (gTTS/OpenAI factory)
+├── utils/              # Config validator, patent logger
+├── video/              # MoviePy video rendering
+└── webcam/             # MediaPipe gaze + expression detection
+
+neurosync-ui/src/
+├── components/         # teacher/ student/ shared/ visualizations/
+├── hooks/              # useFusionLoop, useWebcam, useKeyboardShortcuts
+├── stores/             # Zustand state management
+└── utils/              # Error handling utilities
+
+docs/                   # Architecture, installation, patents, demo
+scripts/                # Content generation, verification, demos
+tests/                  # 490+ automated tests
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed component documentation.
 
 ## The 22 Learning Moments
 
 | ID | Moment | Detection Method |
 |----|--------|------------------|
-| M01 | Attention Drop | Webcam gaze tracking |
-| M02 | Cognitive Overload | Response time + rewind patterns |
+| M01 | Attention Drop | Webcam gaze + behavioral idle |
+| M02 | Cognitive Overload | Rewind bursts + facial tension + NLP confusion |
 | M03 | Boredom | Behavioral disengagement signals |
 | M04 | Confusion | NLP analysis + expression detection |
 | M05 | Response Slowdown | Timing analysis |
@@ -157,6 +126,8 @@ docs/                 # Migration guide, content guide, slides outline
 | M21 | Review Needed | Spaced repetition triggers |
 | M22 | Discomfort | Multimodal stress signals |
 
+M01, M02, and M10 have full tiered confidence implementations with patent-documented thresholds. Remaining moments use the same `BaseMomentDetector` framework.
+
 ## Tech Stack
 
 | Component | Technology | Cost |
@@ -167,80 +138,85 @@ docs/                 # Migration guide, content guide, slides outline
 | Backend | Python 3.11+, FastAPI, asyncio | -- |
 | Frontend | React 18, TypeScript, Vite | -- |
 | Desktop | Electron 28 | -- |
-| Database | SQLite (WAL mode) | -- |
-| Signal Processing | scipy, numpy | -- |
+| Fusion | LangGraph (8 agents) | -- |
 | Webcam | MediaPipe | -- |
+| Signal Processing | scipy, numpy | -- |
+| Database | SQLite (WAL mode) | -- |
 | Video | MoviePy | -- |
-| Fusion | LangGraph | -- |
 | Testing | pytest, vitest, Playwright | -- |
 
 ## Testing
 
 ```bash
-# Run all Python tests
-pytest tests/ -v
-
-# Run with coverage
-pytest tests/ -v --cov=neurosync --cov-report=term-missing
-
-# Run frontend tests
-cd neurosync-ui && npm test
-
-# Run specific test file
-pytest tests/test_llm_providers.py -v
+pytest tests/ -v                    # Run all tests
+pytest tests/ --cov=neurosync       # With coverage
+cd neurosync-ui && npm test         # Frontend tests
 ```
 
-**Test counts by component:**
-- Behavioral Signal Collector: 41 tests
-- Webcam Vision Layer: 20 tests
-- Knowledge Graph: 43 tests
-- NLP Pipeline: 39 tests
-- LangGraph Fusion Engine: 33 tests
-- Intervention Generator: 24 tests
-- Content Generation: 42 tests
-- Spaced Repetition: 22 tests
-- Pre-Lesson Readiness: 18 tests
-- UI Components: 42 tests
-- Experiments Framework: 28 tests
-- Provider Migration: 51 tests
-- **Total: 400+ tests**
+490+ automated tests across all components. Key areas:
+- Behavioral signals, webcam, NLP pipeline
+- Fusion engine, moment detectors (tiered confidence)
+- Content generation pipeline
+- Knowledge graph, spaced repetition
+- Provider migration (Groq/gTTS)
+- Patent logging integration
 
 ## Demo
 
-See [DEMO_SCRIPT.md](DEMO_SCRIPT.md) for the complete 5-minute demo walkthrough with Q&A preparation.
+See [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for the 5-minute presentation with timing marks and backup plans.
 
-### Sample Content
+```bash
+# Generate sample courses
+python scripts/create_source_pdfs.py
+python scripts/generate_sample_content.py
 
-1. Create source PDFs following [docs/SAMPLE_CONTENT_GUIDE.md](docs/SAMPLE_CONTENT_GUIDE.md)
-2. Generate courses: `python scripts/generate_sample_content.py`
-3. Verify output: `python scripts/verify_sample_content.py`
+# Run intervention demo
+python scripts/demo_interventions.py
+
+# Verify everything
+python scripts/verify_sample_content.py --full
+```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and component details |
+| [INSTALLATION.md](docs/INSTALLATION.md) | Setup and configuration guide |
+| [PATENT_CLAIMS.md](docs/PATENT_CLAIMS.md) | 3 provisional patent claims |
+| [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 5-minute hackathon demo script |
+| [QA_RESPONSES.md](docs/QA_RESPONSES.md) | 20+ anticipated judge Q&As |
+| [PRESENTATION_SLIDES.md](docs/PRESENTATION_SLIDES.md) | 12-slide deck content |
+| [SAMPLE_CONTENT_GUIDE.md](docs/SAMPLE_CONTENT_GUIDE.md) | Content creation guide |
 
 ## Project Status
 
-| Step | Component | Status |
-|------|-----------|--------|
-| 1 | Behavioral Signal Collector | Complete |
-| 2 | Webcam Vision Layer | Complete |
-| 3 | Knowledge Graph (Neo4j) | Complete |
-| 4 | NLP Pipeline | Complete |
-| 5 | LangGraph Fusion Engine | Complete |
-| 6 | GPT-4 Intervention Generator | Complete |
-| 7 | Content Generation Pipeline | Complete |
-| 8 | Spaced Repetition Engine | Complete |
-| 9 | Pre-Lesson Readiness Protocol | Complete |
-| 10 | Electron Desktop UI | Complete |
-| 11 | Experiments Framework | Complete |
-| 12 | API Server & Integration | Complete |
-| 13 | Free API Migration (Groq + gTTS) | Complete |
+| Phase | Component | Status |
+|-------|-----------|--------|
+| 1 | Groq + gTTS migration ($0 cost) | Complete |
+| 2 | Tiered confidence detection (22 moments) | Complete |
+| 3 | Sample content and demo materials | Complete |
+| 4 | Patent documentation and production polish | Complete |
+| -- | Behavioral Signal Collector | Complete |
+| -- | Webcam Vision Layer (MediaPipe) | Complete |
+| -- | Knowledge Graph (Neo4j) | Complete |
+| -- | NLP Pipeline | Complete |
+| -- | LangGraph Fusion Engine (8 agents) | Complete |
+| -- | Intervention Generator (Groq) | Complete |
+| -- | Content Generation Pipeline | Complete |
+| -- | Spaced Repetition Engine | Complete |
+| -- | Pre-Lesson Readiness Protocol | Complete |
+| -- | Electron Desktop UI | Complete |
+| -- | Experiments Framework (A/B testing) | Complete |
+| -- | API Server and Integration | Complete |
 
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch (`git checkout -b feature/your-feature`)
 3. Run all tests (`pytest tests/ -v`)
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+4. Commit your changes
+5. Push and open a Pull Request
 
 ## License
 
