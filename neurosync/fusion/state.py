@@ -65,6 +65,22 @@ class KnowledgeSignals(BaseModel):
     plateau_concept_id: Optional[str] = None
 
 
+class EEGSignals(BaseModel):
+    """
+    Optional EEG signals (from Step 10).
+
+    All fields default to 0.0 so the model is safe to construct even
+    when hardware is absent.  The ``quality`` field gates whether any
+    agent should trust the readings (threshold: 0.6).
+    """
+    quality: float = 0.0
+    alpha_power: float = 0.0
+    beta_power: float = 0.0
+    theta_power: float = 0.0
+    gamma_power: float = 0.0
+    frontal_asymmetry: float = 0.0
+
+
 class NLPSignals(BaseModel):
     """Aggregated NLP signals (from Step 4)."""
     overload_detected: bool = False
@@ -136,11 +152,12 @@ class FusionState(BaseModel):
     timestamp: float = Field(default_factory=_now)
     cycle_number: int = 0
 
-    # Signals from the four layers
+    # Signals from the four layers (+optional EEG)
     behavioral: BehavioralSignals = Field(default_factory=BehavioralSignals)
     webcam: Optional[WebcamSignals] = None
     knowledge: KnowledgeSignals = Field(default_factory=KnowledgeSignals)
     nlp: Optional[NLPSignals] = None
+    eeg: Optional[EEGSignals] = None
 
     # Session context
     session_duration_minutes: float = 0.0

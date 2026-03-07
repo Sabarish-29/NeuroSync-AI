@@ -417,6 +417,33 @@ TTS_CONFIG: dict[str, object] = {
 }
 
 
+# =============================================================================
+# EEG Configuration (Step 10 - Optional Enhancement)
+# =============================================================================
+EEG_CONFIG: dict[str, object] = {
+    # CRITICAL: Default to DISABLED for reliability
+    "ENABLED": os.getenv("EEG_ENABLED", "false").lower() == "true",
+    "DEVICE_TYPE": os.getenv("EEG_DEVICE", "mock"),
+    "PORT": os.getenv("EEG_PORT", "/dev/ttyUSB0"),
+    "BAUDRATE": int(os.getenv("EEG_BAUDRATE", "9600")),
+    "SAMPLING_RATE": 250,
+    "BUFFER_SIZE": 500,
+    "MIN_QUALITY": 0.6,
+    "FALLBACK_ON_ERROR": True,
+}
+
+
+# =============================================================================
+# Moment Detection Configuration (Phase 2 - Tiered Confidence)
+# =============================================================================
+MOMENT_DETECTION: dict[str, object] = {
+    "BASE_THRESHOLD": 0.70,
+    "EEG_BOOST_MAX": 0.20,
+    "PRIMARY_SOURCES": ["webcam", "behavioral", "nlp"],
+    "OPTIONAL_SOURCES": ["eeg"],
+}
+
+
 def get_llm_provider():
     """Get configured LLM provider via factory."""
     from neurosync.llm.factory import LLMProviderFactory
