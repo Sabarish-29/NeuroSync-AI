@@ -9,6 +9,7 @@ Orchestrates the complete content generation workflow:
 
 from __future__ import annotations
 
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -30,6 +31,7 @@ from neurosync.content.generators.video_assembler import VideoAssembler
 from neurosync.content.parsers.pdf_parser import PDFDocument, PDFParser
 from neurosync.content.parsers.text_cleaner import CleanedText, TextCleaner
 from neurosync.content.progress_tracker import PipelineStage, ProgressTracker
+from neurosync.content.tts.gtts_tts import GttsTTS
 from neurosync.content.tts.openai_tts import OpenAITTS
 
 
@@ -42,7 +44,7 @@ class PipelineConfig:
     chunk_overlap: int = 200
 
     # Concept Extraction
-    extraction_model: str = "gpt-4-turbo-preview"
+    extraction_model: str = "llama-3.3-70b-versatile"
     extraction_max_tokens: int = 2000
     extraction_temperature: float = 0.3
 
@@ -50,16 +52,16 @@ class PipelineConfig:
     max_slides_per_concept: int = 3
 
     # Script / Narration
-    script_model: str = "gpt-4-turbo-preview"
-    tts_model: str = "tts-1"
-    tts_voice: str = "alloy"
+    script_model: str = "llama-3.3-70b-versatile"
+    tts_model: str = "tts-1"       # Used only when TTS_PROVIDER=openai
+    tts_voice: str = "alloy"       # Used only when TTS_PROVIDER=openai
 
     # Story
-    story_model: str = "gpt-4-turbo-preview"
+    story_model: str = "llama-3.3-70b-versatile"
     story_temperature: float = 0.8
 
     # Quiz
-    quiz_model: str = "gpt-4-turbo-preview"
+    quiz_model: str = "llama-3.3-70b-versatile"
     quiz_questions_per_concept: int = 3
 
     # Video
@@ -141,11 +143,15 @@ class ContentPipeline:
             client=self.client,
             model=self.config.script_model,
         )
-        self.tts = OpenAITTS(
-            client=self.client,
-            model=self.config.tts_model,
-            voice=self.config.tts_voice,
-        )
+        # TTS: gTTS (FREE) by default; OpenAI TTS only when TTS_PROVIDER=openai
+        if os.getenv("TTS_PROVIDER", "gtts") == "openai" and self.client is not None:
+            self.tts: OpenAITTS | GttsTTS = OpenAITTS(
+                client=self.client,
+                model=self.config.tts_model,
+                voice=self.config.tts_voice,
+            )
+        else:
+            self.tts = GttsTTS()
         self.video_assembler = VideoAssembler(
             fps=self.config.video_fps,
             resolution=self.config.video_resolution,
