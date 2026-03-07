@@ -2,8 +2,10 @@
 """
 NeuroSync AI — Intervention Engine Demo (Step 6).
 
-Generates all 6 intervention types. Uses the real OpenAI API if
-OPENAI_API_KEY is set, otherwise falls back to templates.
+Generates all 6 intervention types.  Provider priority:
+  1. Groq (FREE) — if GROQ_API_KEY is set and LLM_PROVIDER=groq (default)
+  2. OpenAI GPT-4 — if OPENAI_API_KEY is set and LLM_PROVIDER=openai
+  3. Fallback templates — when no API key is available
 
 Usage:
     python scripts/demo_interventions.py
@@ -88,14 +90,24 @@ DEMO_SCENARIOS = [
 
 
 async def main() -> None:
-    api_key = os.getenv("OPENAI_API_KEY", "")
-    mode = "GPT-4" if api_key.startswith("sk-") else "FALLBACK (no API key)"
+    provider = os.getenv("LLM_PROVIDER", "groq")
+    groq_key = os.getenv("GROQ_API_KEY", "")
+    openai_key = os.getenv("OPENAI_API_KEY", "")
+
+    if provider == "groq" and groq_key:
+        mode = "Groq Llama 3.3 70B (FREE)"
+    elif openai_key.startswith("sk-"):
+        mode = "OpenAI GPT-4"
+    else:
+        mode = "FALLBACK (no API key)"
+
     print(f"\n{'=' * 60}")
     print(f"  NEUROSYNC AI — Intervention Engine Demo")
     print(f"  Mode: {mode}")
     print(f"{'=' * 60}\n")
 
-    gen = InterventionGenerator(api_key=api_key or "sk-test-dummy")
+    # Let InterventionGenerator resolve the provider/key automatically
+    gen = InterventionGenerator()
     total_tokens = 0
     total_cost = 0.0
 
