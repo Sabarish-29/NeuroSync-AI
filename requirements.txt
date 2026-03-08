@@ -55,6 +55,7 @@ plyer>=2.1.0
 
 # Desktop Application API (Step 11)
 fastapi>=0.104.0
+python-multipart>=0.0.6        # Required for FastAPI file uploads (UploadFile)
 
 # Experiment Framework (Step 12)
 pandas>=2.0.0
